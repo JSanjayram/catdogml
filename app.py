@@ -1,9 +1,11 @@
+import os
+os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
+
 import streamlit as st
 import tensorflow as tf
 import numpy as np
 from PIL import Image
 import cv2
-import os
 import requests
 from io import BytesIO
 
