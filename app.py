@@ -41,11 +41,6 @@ def main():
     st.title("🐱🐶 Cat vs Dog Classifier")
     st.markdown("Upload an image to classify if it's a cat or dog!")
     
-    # Auto-train on first deployment
-    from auto_train import auto_train_on_first_run
-    if not auto_train_on_first_run():
-        return
-    
     # Load model
     model = load_model()
     
