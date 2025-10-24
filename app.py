@@ -1,3 +1,4 @@
+import json
 import streamlit as st
 from cat_dog_model import CatDogClassifier
 import tempfile
