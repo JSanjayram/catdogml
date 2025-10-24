@@ -40,6 +40,18 @@ def main():
     .stRadio > div > label:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
     .stRadio { text-align: center; }
     .stRadio > div > div { margin: 0 auto; }
+    header[data-testid="stHeader"] {
+        display: none;
+    }
+    .stDeployButton {
+        display: none;
+    }
+    header[data-testid="stHeader"] {
+        display: none;
+    }
+    .stDeployButton {
+        display: none;
+    }
     </style>
     """, unsafe_allow_html=True)
     
