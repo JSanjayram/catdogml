@@ -71,7 +71,7 @@ def main():
     except FileNotFoundError:
         pass
     
-    st.markdown("<h1 style='text-align: center;'>🐱 Cat vs Dog Classifier🐶</h1>", unsafe_allow_html=True)
+    st.markdown("<h1 style='text-align: center;'>🐱 Cat vs Dog Classifier 🐶</h1>", unsafe_allow_html=True)
     st.markdown("<p style='text-align: center; font-size: 18px; margin-bottom: 30px;'>Upload an image or provide URL to classify if it's a cat or dog with 90%+ accuracy!</p>", unsafe_allow_html=True)
     
     classifier = load_model()
@@ -146,13 +146,22 @@ def main():
                 col1, col2, col3 = st.columns(3)
                 
                 with col2:
-                    if result['confidence'] >= 0.9:
-                        st.success(f"**{result['prediction'].upper()}** ({result['confidence']:.1%} confidence)")
-                    else:
-                        st.warning(f"**{result['prediction'].upper()}** ({result['confidence']:.1%} confidence)")
+                    if result['prediction'] == 'Dog':
+                        if result['confidence'] >= 0.9:
+                            st.success(f"Hey it's **DOG** WOW WOW! ({result['confidence']:.1%} confidence)")
+                        else:
+                            st.warning(f"Hey it's **DOG** WOW WOW! ({result['confidence']:.1%} confidence)")
+                    else:  # Cat
+                        if result['confidence'] >= 0.9:
+                            st.success(f"Hey it's **CAT** MEOW MEOW! ({result['confidence']:.1%} confidence)")
+                        else:
+                            st.warning(f"Hey it's **CAT** MEOW MEOW! ({result['confidence']:.1%} confidence)")
                 
                 # Show confidence breakdown
-                st.subheader("Prediction Confidence")
+                if result['prediction'] == 'Dog':
+                    st.subheader("🐶 Woof! Prediction Confidence")
+                else:
+                    st.subheader("🐱 Meow! Prediction Confidence")
                 
                 if result['prediction'] == 'Cat':
                     st.progress(result['confidence'], text=f"Cat: {result['confidence']:.1%}")
