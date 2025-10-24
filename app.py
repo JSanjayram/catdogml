@@ -35,6 +35,37 @@ def main():
     st.write("Upload an image or provide URL to classify if it's a cat or dog (90% confidence required)")
     
     classifier = load_model()
+    try:
+        with open('Happy Dog.json', 'r') as f:
+            lottie_data = json.load(f)
+        with open('cute-cat (2).json', 'r') as f:
+            cat_data = json.load(f)
+            show_animations = True
+    except FileNotFoundError:
+        lottie_data = {}
+        cat_data = {}
+        show_animations = False
+    if show_animations:
+        st.components.v1.html(f"""
+    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
+    <div style="display: flex; justify-content: center;">
+        <lottie-player id="happy-dog" background="transparent" speed="1" 
+                    style="width: 400px; height: 200px;" loop autoplay>
+        </lottie-player>
+    </div>
+    <div style="display: flex; justify-content: center; margin-top: -120px; margin-left: -60px;">
+        <lottie-player id="cute-cat" background="transparent" speed="1" 
+                    style="width: 200px; height: 130px;" loop autoplay>
+        </lottie-player>
+    </div>
+    <script>
+        document.getElementById('happy-dog').load({json.dumps(lottie_data)});
+        document.getElementById('cute-cat').load({json.dumps(cat_data)});
+    </script>
+    """, height=200)
+    else:
+        st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
+
     
     # Input method selection
     input_method = st.radio("Choose input method:", ["Upload File", "Image URL"])
