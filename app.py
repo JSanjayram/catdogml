@@ -108,53 +108,73 @@ def main():
     else:
         st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
     
-    
-    
     # Enhanced input method selection
-    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Choose Input Method</h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Choose Input Method<br style='font-size:10px;'><span style='color: #FFD700;font-size:10px'>Note: This model is trained specifically to recognize animals found in Tamil Nadu.</span></br></h3>", unsafe_allow_html=True)
     
     # Center the radio buttons
     col1, col2, col3 = st.columns([1, 2, 1])
     with col2:
         input_method = st.radio("", ["📁 Upload File", "🔗 Image URL"], horizontal=True)
+        
+        # Sample images section in 3x2 grid
+        st.markdown("<p style='text-align: center; margin: 10px 0;'>Or try sample images:</p>", unsafe_allow_html=True)
+        
+        sample_images = {
+            "Cat 1": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=200&h=200&fit=crop",
+            "Cat 2": "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=200&h=200&fit=crop", 
+            "Cat 3": "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?w=200&h=200&fit=crop",
+            "Dog 1": "https://images.unsplash.com/photo-1568572933382-74d440642117?w=200&h=200&fit=crop",
+            "Dog 2": "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=200&h=200&fit=crop",
+            "Dog 3": "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=200&h=200&fit=crop"
+        }
+        
+        selected_sample = None
+        
+        # 3x2 grid for sample images
+        row1_col1, row1_col2, row1_col3 = st.columns(3, gap="small")
+        with row1_col1:
+            st.image(sample_images["Cat 1"], width=100)
+            if st.button("🐱 Cat 1", key="cat1"):
+                selected_sample = sample_images["Cat 1"]
+        with row1_col2:
+            st.image(sample_images["Cat 2"], width=100)
+            if st.button("🐱 Cat 2", key="cat2"):
+                selected_sample = sample_images["Cat 2"]
+        with row1_col3:
+            st.image(sample_images["Cat 3"], width=100)
+            if st.button("🐱 Cat 3", key="cat3"):
+                selected_sample = sample_images["Cat 3"]
+        
+        row2_col1, row2_col2, row2_col3 = st.columns(3, gap="small")
+        with row2_col1:
+            st.image(sample_images["Dog 1"], width=100)
+            if st.button("🐶 Dog 1", key="dog1"):
+                selected_sample = sample_images["Dog 1"]
+        with row2_col2:
+            st.image(sample_images["Dog 2"], width=100)
+            if st.button("🐶 Dog 2", key="dog2"):
+                selected_sample = sample_images["Dog 2"]
+        with row2_col3:
+            st.image(sample_images["Dog 3"], width=100)
+            if st.button("🐶 Dog 3", key="dog3"):
+                selected_sample = sample_images["Dog 3"]
     
     image = None
     
+    # Handle sample image selection with session state
+    if selected_sample:
+        st.session_state.selected_image_url = selected_sample
+    
+    # Load image from session state if available
+    if 'selected_image_url' in st.session_state and st.session_state.selected_image_url:
+        try:
+            response = requests.get(st.session_state.selected_image_url)
+            image = Image.open(BytesIO(response.content))
+        except Exception as e:
+            st.error("Failed to load sample image")
+    
     col1, col2, col3 = st.columns([1, 2, 1])
-    # Sample images section
-    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Try Sample Images</h3>", unsafe_allow_html=True)
     
-    col1, col2, col3, col4, col5, col6 = st.columns([3,3,3,3,3,3])
-    
-    sample_images = {
-        "Cat 1": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300",
-        "Cat 2": "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=300", 
-        "Cat 3": "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?w=300",
-        "Dog 1": "https://images.unsplash.com/photo-1552053831-71594a27632d?w=300",
-        "Dog 2": "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300",
-        "Dog 3": "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300"
-    }
-    
-    selected_sample = None
-    
-    with col1:
-        if st.button("🐱 Cat 1", key="cat1"):
-            selected_sample = sample_images["Cat 1"]
-    with col2:
-        if st.button("🐱 Cat 2", key="cat2"):
-            selected_sample = sample_images["Cat 2"]
-    with col3:
-        if st.button("🐱 Cat 3", key="cat3"):
-            selected_sample = sample_images["Cat 3"]
-    with col4:
-        if st.button("🐶 Dog 1", key="dog1"):
-            selected_sample = sample_images["Dog 1"]
-    with col5:
-        if st.button("🐶 Dog 2", key="dog2"):
-            selected_sample = sample_images["Dog 2"]
-    with col6:
-        if st.button("🐶 Dog 3", key="dog3"):
-            selected_sample = sample_images["Dog 3"]
     with col2:
         if input_method == "📁 Upload File":
             uploaded_file = st.file_uploader("Choose an image", type=['jpg', 'jpeg', 'png'])
@@ -169,14 +189,6 @@ def main():
                     image = Image.open(BytesIO(response.content))
                 except Exception as e:
                     st.error("Failed to load image from URL")
-        
-        # Handle sample image selection
-        if selected_sample:
-            try:
-                response = requests.get(selected_sample)
-                image = Image.open(BytesIO(response.content))
-            except Exception as e:
-                st.error("Failed to load sample image")
         
         if image:
             st.image(image, caption="Input Image", width=400)
