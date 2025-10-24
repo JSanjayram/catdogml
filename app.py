@@ -108,6 +108,19 @@ def main():
     else:
         st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
     
+    
+    
+    # Enhanced input method selection
+    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Choose Input Method</h3>", unsafe_allow_html=True)
+    
+    # Center the radio buttons
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        input_method = st.radio("", ["📁 Upload File", "🔗 Image URL"], horizontal=True)
+    
+    image = None
+    
+    col1, col2, col3 = st.columns([1, 2, 1])
     # Sample images section
     st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Try Sample Images</h3>", unsafe_allow_html=True)
     
@@ -142,19 +155,6 @@ def main():
     with col6:
         if st.button("🐶 Dog 3", key="dog3"):
             selected_sample = sample_images["Dog 3"]
-    
-    # Enhanced input method selection
-    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Choose Input Method</h3>", unsafe_allow_html=True)
-    
-    # Center the radio buttons
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        input_method = st.radio("", ["📁 Upload File", "🔗 Image URL"], horizontal=True)
-    
-    image = None
-    
-    col1, col2, col3 = st.columns([1, 2, 1])
-    
     with col2:
         if input_method == "📁 Upload File":
             uploaded_file = st.file_uploader("Choose an image", type=['jpg', 'jpeg', 'png'])
