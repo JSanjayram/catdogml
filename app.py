@@ -1,20 +1,24 @@
+#!/usr/bin/env python3
 import os
 os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
 
 import streamlit as st
+
+# Configure page first
+st.set_page_config(
+    page_title="Cat vs Dog Classifier",
+    page_icon="🐱🐶",
+    layout="centered"
+)
+
+# Import heavy libraries after streamlit config
 import tensorflow as tf
 import numpy as np
 from PIL import Image
 import cv2
 import requests
 from io import BytesIO
-
-# Configure page
-st.set_page_config(
-    page_title="Cat vs Dog Classifier",
-    page_icon="🐱🐶",
-    layout="centered"
-)
 
 @st.cache_resource
 def load_model():
