@@ -24,15 +24,7 @@ def main():
     # Enhanced UI/UX styling
     st.markdown("""
     <style>
-    .stApp {
-        background: radial-gradient(circle farthest-corner at -24.7% -47.3%, rgba(6,130,165,1) 0%, rgba(34,48,86,1) 66.8%, rgba(15,23,42,1) 100.2%) !important;
-    }
-    .main {
-        background: transparent !important;
-    }
-    .block-container {
-        background: transparent !important;
-    }
+    .main { background: linear-gradient(45deg, #ff6b6b, #4ecdc4);background-image: radial-gradient( circle farthest-corner at -24.7% -47.3%,  rgba(6,130,165,1) 0%, rgba(34,48,86,1) 66.8%, rgba(15,23,42,1) 100.2% ) !important; }
     .stTitle { text-align: center; }
     .stMarkdown { text-align: center; }
     .stRadio > div { display: flex; justify-content: center; gap: 30px; align-items: center; flex-wrap: wrap; }
