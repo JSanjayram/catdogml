@@ -124,7 +124,7 @@ def main():
     # Sample images section
     st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Try Sample Images</h3>", unsafe_allow_html=True)
     
-    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    col1, col2, col3, col4, col5, col6 = st.columns([3,3,3,3,3,3])
     
     sample_images = {
         "Cat 1": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300",
