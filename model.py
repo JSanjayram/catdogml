@@ -11,19 +11,20 @@ class CatDogClassifier:
         self.img_size = (128, 128)
     
     def _build_model(self):
-        base_model = tf.keras.applications.MobileNetV2(
-            input_shape=(128, 128, 3),
-            include_top=False,
-            weights='imagenet'
-        )
-        base_model.trainable = False
-        
         model = models.Sequential([
-            layers.Input(shape=(128, 128, 3)),
-            layers.Rescaling(1./127.5, offset=-1),
-            base_model,
-            layers.GlobalAveragePooling2D(),
-            layers.Dropout(0.2),
+            layers.Rescaling(1./255, input_shape=(128, 128, 3)),
+            layers.Conv2D(32, 3, activation='relu'),
+            layers.MaxPooling2D(),
+            layers.Dropout(0.25),
+            layers.Conv2D(64, 3, activation='relu'),
+            layers.MaxPooling2D(),
+            layers.Dropout(0.25),
+            layers.Conv2D(128, 3, activation='relu'),
+            layers.MaxPooling2D(),
+            layers.Dropout(0.25),
+            layers.Flatten(),
+            layers.Dense(128, activation='relu'),
+            layers.Dropout(0.5),
             layers.Dense(1, activation='sigmoid')
         ])
         
