@@ -20,78 +20,126 @@ def process_image(image, classifier):
         result = classifier.predict_image(image)
     return result
 
-def display_results(result):
-    """Display prediction results"""
-    st.subheader("Results:")
-    if result['status'] == 'confident':
-        st.success(f"**Prediction: {result['prediction']}**")
-        st.info(f"Confidence: {result['confidence']:.2%}")
-    else:
-        st.warning("**Uncertain Classification**")
-        st.error(result['message'])
-        st.info(f"Current confidence: {result['confidence']:.2%}")
-
 def main():
-    st.title("🐱🐶 Cat vs Dog Classifier")
-    st.write("Upload an image or provide URL to classify if it's a cat or dog (90% confidence required)")
+    # Enhanced UI/UX styling
+    st.markdown("""
+    <style>
+    .main { background: linear-gradient(45deg, #ff6b6b, #4ecdc4);background-image: radial-gradient( circle farthest-corner at -24.7% -47.3%,  rgba(6,130,165,1) 0%, rgba(34,48,86,1) 66.8%, rgba(15,23,42,1) 100.2% ); }
+    .stTitle { text-align: center; }
+    .stMarkdown { text-align: center; }
+    .stRadio > div { display: flex; justify-content: center; gap: 30px; align-items: center; flex-wrap: wrap; }
+    .stRadio > div > label { background: rgba(0,0,0,0.9); color: white; padding: 15px 25px; border-radius: 15px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); transition: all 0.3s; margin: 0 auto; }
+    .stRadio > div > label:hover { transform: translateY(-2px); box-shadow: 0 6px 12px rgba(0,0,0,0.15); }
+    .stRadio { text-align: center; }
+    .stRadio > div > div { margin: 0 auto; }
+    </style>
+    """, unsafe_allow_html=True)
     
-    classifier = load_model()
+    # Load animations if available
+    dog_data = {}
+    cat_data = {}
+    
     try:
         with open('Happy Dog.json', 'r') as f:
-            lottie_data = json.load(f)
+            dog_data = json.load(f)
+    except FileNotFoundError:
+        pass
+        
+    try:
         with open('cute-cat (2).json', 'r') as f:
             cat_data = json.load(f)
-            show_animations = True
     except FileNotFoundError:
-        lottie_data = {}
-        cat_data = {}
-        show_animations = False
-    if show_animations:
-        st.components.v1.html(f"""
-    <script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>
-    <div style="display: flex; justify-content: center;">
-        <lottie-player id="happy-dog" background="transparent" speed="1" 
-                    style="width: 400px; height: 200px;" loop autoplay>
-        </lottie-player>
-    </div>
-    <div style="display: flex; justify-content: center; margin-top: -120px; margin-left: -60px;">
-        <lottie-player id="cute-cat" background="transparent" speed="1" 
-                    style="width: 200px; height: 130px;" loop autoplay>
-        </lottie-player>
-    </div>
-    <script>
-        document.getElementById('happy-dog').load({json.dumps(lottie_data)});
-        document.getElementById('cute-cat').load({json.dumps(cat_data)});
-    </script>
-    """, height=200)
+        pass
+    
+    st.markdown("<h1 style='text-align: center;'>🐱 Cat vs Dog Classifier🐶</h1>", unsafe_allow_html=True)
+    st.markdown("<p style='text-align: center; font-size: 18px; margin-bottom: 30px;'>Upload an image or provide URL to classify if it's a cat or dog with 90%+ accuracy!</p>", unsafe_allow_html=True)
+    
+    classifier = load_model()
+    
+    if dog_data or cat_data:
+        html = '<script src="https://unpkg.com/@lottiefiles/lottie-player@latest/dist/lottie-player.js"></script>'
+        
+        if dog_data:
+            html += f'''
+            <div style="display: flex; justify-content: center;">
+                <lottie-player id="happy-dog" background="transparent" speed="1" 
+                               style="width: 400px; height: 200px;" loop autoplay>
+                </lottie-player>
+            </div>
+            '''
+            
+        if cat_data:
+            html += f'''
+            <div style="display: flex; justify-content: center; margin-top: -120px; margin-left: -60px;">
+                <lottie-player id="cute-cat" background="transparent" speed="1" 
+                               style="width: 200px; height: 130px;" loop autoplay>
+                </lottie-player>
+            </div>
+            '''
+            
+        html += '<script>'
+        if dog_data:
+            html += f'document.getElementById("happy-dog").load({json.dumps(dog_data)});'
+        if cat_data:
+            html += f'document.getElementById("cute-cat").load({json.dumps(cat_data)});'
+        html += '</script>'
+        
+        st.components.v1.html(html, height=200)
     else:
         st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
-
     
-    # Input method selection
-    input_method = st.radio("Choose input method:", ["Upload File", "Image URL"])
+    # Enhanced input method selection
+    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Choose Input Method</h3>", unsafe_allow_html=True)
+    
+    # Center the radio buttons
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        input_method = st.radio("", ["📁 Upload File", "🔗 Image URL"], horizontal=True)
     
     image = None
     
-    if input_method == "Upload File":
-        uploaded_file = st.file_uploader("Choose an image...", type=['jpg', 'jpeg', 'png'])
-        if uploaded_file is not None:
-            image = Image.open(uploaded_file)
-            st.image(image, caption='Uploaded Image', use_container_width=True)
+    col1, col2, col3 = st.columns([1, 2, 1])
     
-    else:  # Image URL
-        url = st.text_input("Enter image URL:")
-        if url:
-            try:
-                response = requests.get(url)
-                image = Image.open(BytesIO(response.content))
-                st.image(image, caption='Image from URL', use_container_width=True)
-            except Exception as e:
-                st.error(f"Error loading image: {str(e)}")
-    
-    if image is not None:
-        result = process_image(image, classifier)
-        display_results(result)
+    with col2:
+        if input_method == "📁 Upload File":
+            uploaded_file = st.file_uploader("Choose an image", type=['jpg', 'jpeg', 'png'])
+            if uploaded_file:
+                image = Image.open(uploaded_file)
+                
+        else:  # Image URL
+            url = st.text_input("Enter image URL:")
+            if url:
+                try:
+                    response = requests.get(url)
+                    image = Image.open(BytesIO(response.content))
+                except Exception as e:
+                    st.error("Failed to load image from URL")
+        
+        if image:
+            st.image(image, caption="Input Image", width=400)
+            
+            # Load and predict with model
+            if st.button("🔍 Classify Image", type="primary"):
+                result = process_image(image, classifier)
+                
+                # Display results
+                col1, col2, col3 = st.columns(3)
+                
+                with col2:
+                    if result['confidence'] >= 0.9:
+                        st.success(f"**{result['prediction'].upper()}** ({result['confidence']:.1%} confidence)")
+                    else:
+                        st.warning(f"**{result['prediction'].upper()}** ({result['confidence']:.1%} confidence)")
+                
+                # Show confidence breakdown
+                st.subheader("Prediction Confidence")
+                
+                if result['prediction'] == 'Cat':
+                    st.progress(result['confidence'], text=f"Cat: {result['confidence']:.1%}")
+                    st.progress(1-result['confidence'], text=f"Dog: {1-result['confidence']:.1%}")
+                else:
+                    st.progress(1-result['confidence'], text=f"Cat: {1-result['confidence']:.1%}")
+                    st.progress(result['confidence'], text=f"Dog: {result['confidence']:.1%}")
 
 if __name__ == "__main__":
     main()
