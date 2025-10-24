@@ -19,7 +19,8 @@ class CatDogClassifier:
         base_model.trainable = False
         
         model = models.Sequential([
-            layers.Rescaling(1./127.5, offset=-1, input_shape=(128, 128, 3)),
+            layers.Input(shape=(128, 128, 3)),
+            layers.Rescaling(1./127.5, offset=-1),
             base_model,
             layers.GlobalAveragePooling2D(),
             layers.Dropout(0.2),
