@@ -109,7 +109,7 @@ def main():
         st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
     
     # Enhanced input method selection
-    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Choose Input Method<br>This model Trainned by Tamil nadu Animals</></h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Choose Input Method<br style='font-size:10px;'>Note: <span style='color: #FFD700;'>This model Trainned by Tamil nadu Animals</span></br></h3>", unsafe_allow_html=True)
     
     # Center the radio buttons
     col1, col2, col3 = st.columns([1, 2, 1])
