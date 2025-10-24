@@ -1,8 +1,8 @@
-tensorflow>=2.20.0
+tensorflow==2.15.0
 opencv-python
 numpy
 matplotlib
 pillow
-streamlit
+streamlit==1.28.0
 requests
-protobuf<=3.20.3
+protobuf==3.20.3
