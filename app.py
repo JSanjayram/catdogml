@@ -1,138 +1,65 @@
-#!/usr/bin/env python3
-import os
-os.environ['PROTOCOL_BUFFERS_PYTHON_IMPLEMENTATION'] = 'python'
-os.environ['TF_CPP_MIN_LOG_LEVEL'] = '2'
-
 import streamlit as st
-
-# Configure page first
-st.set_page_config(
-    page_title="Cat vs Dog Classifier",
-    page_icon="🐱🐶",
-    layout="centered"
-)
-
-# Import heavy libraries after streamlit config
-import tensorflow as tf
-import numpy as np
+from cat_dog_model import CatDogClassifier
+import tempfile
+import os
 from PIL import Image
-import cv2
 import requests
 from io import BytesIO
 
+# Initialize the classifier
 @st.cache_resource
 def load_model():
-    """Load the trained model with caching"""
-    try:
-        if os.path.exists('models/cat_dog_model.keras'):
-            return tf.keras.models.load_model('models/cat_dog_model.keras')
-    except Exception as e:
-        st.error(f"Error loading model: {str(e)}")
-    return None
+    classifier = CatDogClassifier(confidence_threshold=0.9)
+    classifier.build_model()
+    return classifier
 
-def preprocess_image(image):
-    """Preprocess uploaded image"""
-    img = np.array(image)
-    img = cv2.resize(img, (128, 128))
-    img = img.astype('float32')
-    return np.expand_dims(img, axis=0)
+def process_image(image, classifier):
+    """Process image and return prediction results"""
+    with st.spinner('Analyzing image...'):
+        result = classifier.predict_image(image)
+    return result
+
+def display_results(result):
+    """Display prediction results"""
+    st.subheader("Results:")
+    if result['status'] == 'confident':
+        st.success(f"**Prediction: {result['prediction']}**")
+        st.info(f"Confidence: {result['confidence']:.2%}")
+    else:
+        st.warning("**Uncertain Classification**")
+        st.error(result['message'])
+        st.info(f"Current confidence: {result['confidence']:.2%}")
 
 def main():
     st.title("🐱🐶 Cat vs Dog Classifier")
-    st.markdown("Upload an image to classify if it's a cat or dog!")
+    st.write("Upload an image or provide URL to classify if it's a cat or dog (90% confidence required)")
     
-    # Load model
-    model = load_model()
+    classifier = load_model()
     
-    if model is None:
-        st.warning("⚠️ No trained model found. Running in demo mode.")
-        st.info("This is a demo version. Upload an image to see the interface.")
-        
-        # Demo mode - show interface without prediction
-        uploaded_file = st.file_uploader(
-            "Choose an image...", 
-            type=['jpg', 'jpeg', 'png'],
-            help="Upload a clear image of a cat or dog"
-        )
-        
-        if uploaded_file is not None:
-            image = Image.open(uploaded_file)
-            col1, col2, col3 = st.columns([1, 2, 1])
-            with col2:
-                st.image(image, caption="Demo Image", use_column_width=True)
-            st.info("🔧 Model training required for predictions. This is demo mode only.")
-        return
-    
-    # Input options
-    input_method = st.radio("Choose input method:", ["Upload Image", "Image URL"])
+    # Input method selection
+    input_method = st.radio("Choose input method:", ["Upload File", "Image URL"])
     
     image = None
     
-    if input_method == "Upload Image":
-        uploaded_file = st.file_uploader(
-            "Choose an image...", 
-            type=['jpg', 'jpeg', 'png'],
-            help="Upload a clear image of a cat or dog"
-        )
+    if input_method == "Upload File":
+        uploaded_file = st.file_uploader("Choose an image...", type=['jpg', 'jpeg', 'png'])
         if uploaded_file is not None:
             image = Image.open(uploaded_file)
+            st.image(image, caption='Uploaded Image', use_column_width=True)
     
     else:  # Image URL
-        url = st.text_input("Enter image URL:", placeholder="https://example.com/image.jpg")
+        url = st.text_input("Enter image URL:")
         if url:
             try:
-                with st.spinner("Loading image from URL..."):
-                    response = requests.get(url, timeout=10)
-                    image = Image.open(BytesIO(response.content))
+                response = requests.get(url)
+                image = Image.open(BytesIO(response.content))
+                st.image(image, caption='Image from URL', use_column_width=True)
             except Exception as e:
                 st.error(f"Error loading image: {str(e)}")
     
     if image is not None:
-        # Display image
-        col1, col2, col3 = st.columns([1, 2, 1])
-        
-        with col2:
-            st.image(image, caption="Image to Classify", use_column_width=True)
-        
-        # Predict button
-        if st.button("🔍 Classify Image", type="primary"):
-            with st.spinner("Analyzing image..."):
-                try:
-                    # Preprocess and predict
-                    processed_img = preprocess_image(image)
-                    prediction = model.predict(processed_img, verbose=0)[0][0]
-                    
-                    # Display results with confidence threshold
-                    confidence = float(prediction)
-                    max_confidence = max(confidence, 1-confidence)
-                    
-                    if max_confidence < 0.6:
-                        st.warning(f"⚠️ **UNCERTAIN** - Low confidence ({max_confidence:.1%})")
-                        st.info("Try a clearer image with better lighting")
-                    elif confidence > 0.5:
-                        st.success(f"🐶 **DOG** (Confidence: {confidence:.1%})")
-                    else:
-                        st.success(f"🐱 **CAT** (Confidence: {1-confidence:.1%})")
-                    
-                    st.progress(max_confidence)
-                except Exception as e:
-                    st.error(f"Error processing image: {str(e)}")
-    
-    # Sidebar info
-    with st.sidebar:
-        st.header("ℹ️ About")
-        st.write("This AI model uses deep learning to classify images as cats or dogs.")
-        
-        st.header("📊 Model Info")
-        st.write("- **Architecture**: CNN")
-        st.write("- **Input Size**: 128x128 pixels")
-        st.write("- **Training Data**: 600 images")
-        
-        st.header("💡 Tips")
-        st.write("- Use clear, well-lit images")
-        st.write("- Ensure the animal is the main subject")
-        st.write("- JPG, JPEG, PNG formats supported")
-        st.write("- URLs must be direct image links")
+        result = process_image(image, classifier)
+        display_results(result)
 
 if __name__ == "__main__":
     main()
