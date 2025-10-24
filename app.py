@@ -46,10 +46,10 @@ def main():
     .stDeployButton {
         display: none;
     }
-    header[data-testid="stHeader"] {
+    footer {
         display: none;
     }
-    .stDeployButton {
+    .stApp > footer {
         display: none;
     }
     </style>
