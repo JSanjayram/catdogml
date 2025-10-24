@@ -23,8 +23,11 @@ from io import BytesIO
 @st.cache_resource
 def load_model():
     """Load the trained model with caching"""
-    if os.path.exists('models/cat_dog_model.keras'):
-        return tf.keras.models.load_model('models/cat_dog_model.keras')
+    try:
+        if os.path.exists('models/cat_dog_model.keras'):
+            return tf.keras.models.load_model('models/cat_dog_model.keras')
+    except Exception as e:
+        st.error(f"Error loading model: {str(e)}")
     return None
 
 def preprocess_image(image):
@@ -42,7 +45,22 @@ def main():
     model = load_model()
     
     if model is None:
-        st.error("❌ Model not found! Please train the model first by running `python setup_and_train.py`")
+        st.warning("⚠️ No trained model found. Running in demo mode.")
+        st.info("This is a demo version. Upload an image to see the interface.")
+        
+        # Demo mode - show interface without prediction
+        uploaded_file = st.file_uploader(
+            "Choose an image...", 
+            type=['jpg', 'jpeg', 'png'],
+            help="Upload a clear image of a cat or dog"
+        )
+        
+        if uploaded_file is not None:
+            image = Image.open(uploaded_file)
+            col1, col2, col3 = st.columns([1, 2, 1])
+            with col2:
+                st.image(image, caption="Demo Image", use_column_width=True)
+            st.info("🔧 Model training required for predictions. This is demo mode only.")
         return
     
     # Input options
