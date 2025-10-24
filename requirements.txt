@@ -1,7 +1,9 @@
 tensorflow==2.20.0
-opencv-python
+opencv-python-headless
 numpy
 matplotlib
 pillow
 streamlit
 requests
+protobuf==3.20.3
+--force-reinstall
