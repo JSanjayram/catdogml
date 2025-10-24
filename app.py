@@ -53,7 +53,7 @@ def main():
             try:
                 response = requests.get(url)
                 image = Image.open(BytesIO(response.content))
-                st.image(image, caption='Image from URL', use_column_width=True)
+                st.image(image, caption='Image from URL', use_container_width=True)
             except Exception as e:
                 st.error(f"Error loading image: {str(e)}")
     
