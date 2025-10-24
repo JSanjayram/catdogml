@@ -108,8 +108,43 @@ def main():
     else:
         st.markdown("<div style='height: 50px;'></div>", unsafe_allow_html=True)
     
+    # Sample images section
+    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Try Sample Images</h3>", unsafe_allow_html=True)
+    
+    col1, col2, col3, col4, col5, col6 = st.columns(6)
+    
+    sample_images = {
+        "Cat 1": "https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?w=300",
+        "Cat 2": "https://images.unsplash.com/photo-1573865526739-10659fec78a5?w=300", 
+        "Cat 3": "https://images.unsplash.com/photo-1592194996308-7b43878e84a6?w=300",
+        "Dog 1": "https://images.unsplash.com/photo-1552053831-71594a27632d?w=300",
+        "Dog 2": "https://images.unsplash.com/photo-1583337130417-3346a1be7dee?w=300",
+        "Dog 3": "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=300"
+    }
+    
+    selected_sample = None
+    
+    with col1:
+        if st.button("🐱 Cat 1", key="cat1"):
+            selected_sample = sample_images["Cat 1"]
+    with col2:
+        if st.button("🐱 Cat 2", key="cat2"):
+            selected_sample = sample_images["Cat 2"]
+    with col3:
+        if st.button("🐱 Cat 3", key="cat3"):
+            selected_sample = sample_images["Cat 3"]
+    with col4:
+        if st.button("🐶 Dog 1", key="dog1"):
+            selected_sample = sample_images["Dog 1"]
+    with col5:
+        if st.button("🐶 Dog 2", key="dog2"):
+            selected_sample = sample_images["Dog 2"]
+    with col6:
+        if st.button("🐶 Dog 3", key="dog3"):
+            selected_sample = sample_images["Dog 3"]
+    
     # Enhanced input method selection
-    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Choose Input Method<br style='font-size:10px;'><span style='color: #FFD700;font-size:10px'>Note: This model is trained specifically to recognize animals found in Tamil Nadu.</span></br></h3>", unsafe_allow_html=True)
+    st.markdown("<h3 style='text-align: center; margin-bottom: 20px;'>Choose Input Method</h3>", unsafe_allow_html=True)
     
     # Center the radio buttons
     col1, col2, col3 = st.columns([1, 2, 1])
@@ -134,6 +169,14 @@ def main():
                     image = Image.open(BytesIO(response.content))
                 except Exception as e:
                     st.error("Failed to load image from URL")
+        
+        # Handle sample image selection
+        if selected_sample:
+            try:
+                response = requests.get(selected_sample)
+                image = Image.open(BytesIO(response.content))
+            except Exception as e:
+                st.error("Failed to load sample image")
         
         if image:
             st.image(image, caption="Input Image", width=400)
